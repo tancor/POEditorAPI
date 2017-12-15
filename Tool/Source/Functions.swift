@@ -91,10 +91,19 @@ func processJSON(data: Data, outputFolderURL: URL) throws
 	for translation in translations ?? []
 	{
 		guard let term = translation["term"] as? String,
-			let context = translation["context"] as? String else
+			var context = translation["context"] as? String else
 		{
 			preconditionFailure()
 		}
+  
+        if context.isEmpty {
+            context = "Localizable.strings"
+        } else {
+            let range = context.range(of: "/", options: String.CompareOptions.backwards, range: nil, locale: nil)
+            if let range = range {
+                context = context.substring(from: range.upperBound)
+            }
+        }
 		
 		let translated: TranslatedTerm
 		
