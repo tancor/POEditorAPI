@@ -81,7 +81,7 @@ func exportFolderURL(settings: Settings) -> URL
 	return exportFolderURL
 }
 
-func processJSON(data: Data, outputFolderURL: URL) throws
+func processJSON(data: Data, outputFolderList: [URL]) throws
 {
 	// code json
 	let translations = try JSONSerialization.jsonObject(with: data, options: []) as? [JSONDictionary]
@@ -139,7 +139,9 @@ func processJSON(data: Data, outputFolderURL: URL) throws
 		guard let translations = contexts[key],
 			   let name = stringsFileName(for: key) else { continue }
 		
-		try translations.writeFile(name: name, to: outputFolderURL)
+        for outputUrl in outputFolderList {
+		    try translations.writeFile(name: name, to: outputUrl)
+        }
 	}
 }
 
@@ -157,20 +159,34 @@ func export(with settings: Settings, format: POEditor.ExportFileType = .json, fo
 	{
 		let xcode = xCodeLocaleFromPOEditorCode(code: code)
 		
-		print("\nExporting " + Locale(identifier: "en").localizedString(forIdentifier: xcode)! + " [" + xcode + "]...\n")
+		print("\nExporting " + Locale(identifier: "en").localizedString(forIdentifier: xcode)! + " [" + xcode + "]...")
 		
-		let outputFolderURL = exportURL.appendingPathComponent(xcode + ".lproj", isDirectory: true)
-		
-		do
-		{
-			if !fileManager.fileExists(atPath: exportURL.path)
-			{
-				try fileManager.createDirectory(at: outputFolderURL, withIntermediateDirectories: true, attributes: nil)
+		var outputFolderList: [URL] = [exportURL.appendingPathComponent(xcode + ".lproj", isDirectory: true)]
+        
+        if let mapping = settings.mapping {
+            if let map = mapping[xcode] {
+                outputFolderList.removeAll()
+                
+                let languages = map.joined(separator: ", ")
+                print("Language is mapped, creating: " + languages)
+                
+                for language in map {
+                    let languageURL = exportURL.appendingPathComponent(language + ".lproj", isDirectory: true)
+                    outputFolderList.append(languageURL)
+                }
+            }
+        }
+  
+		do {
+			if !fileManager.fileExists(atPath: exportURL.path) {
+                if let firstURL = outputFolderList.first {
+				    try fileManager.createDirectory(at: firstURL, withIntermediateDirectories: true, attributes: nil)
+                }
 			}
-		}
-		catch
-		{
-			print("Unable to create output folder " + outputFolderURL.path)
+		} catch {
+            if let firstURL = outputFolderList.first {
+			    print("Unable to create output folder " + firstURL.absoluteString)
+            }
 			exit(1)
 		}
 		
@@ -188,7 +204,7 @@ func export(with settings: Settings, format: POEditor.ExportFileType = .json, fo
 					
 					if forXcode
 					{
-						try processJSON(data: data, outputFolderURL: outputFolderURL)
+						try processJSON(data: data, outputFolderList: outputFolderList)
 					}
 					else
 					{

@@ -46,6 +46,8 @@ struct Settings
 			isDirty = true
 		}
 	}
+ 
+    var mapping: [String: [String]]?
 
 	/// Keeps track of modifications
 	var isDirty = false
@@ -72,6 +74,7 @@ struct Settings
 				projectID = settings["projectID"] as? Int
 				languages = settings["languages"] as? [String]
 				outputFolder = settings["outputFolder"] as? String
+                mapping = settings["mapping"] as? [String: [String]]
 			}
 		}
 		catch _
