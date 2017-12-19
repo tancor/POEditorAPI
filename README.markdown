@@ -56,3 +56,17 @@ POEditor Tool (POET)
 ====================
 
 A command line utility that exports specific languages from a POEditor.com project and creates `.strings` and `.stringsdict` files accordingly. Build it and place it in e.g. `/usr/local/bin`. Then run it in the root of a project and follow the prompts. 
+
+Re mapping languages, after the first run a settings will be create for poet call `poet.json`
+You can add an extra setting in this file to remap languages:
+```
+ "mapping" : {
+     "en-US" : ["en"],
+     "pt-BR" : ["pt-BR", "pt-PT"]
+ }
+```
+This wil map `en-US` to just `en` and copy `pt-BR` to both `pt-BR` and `pt-Pt`
+
+
+
+
