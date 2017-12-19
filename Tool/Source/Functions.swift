@@ -139,8 +139,9 @@ func processJSON(data: Data, outputFolderList: [URL]) throws
 		guard let translations = contexts[key],
 			   let name = stringsFileName(for: key) else { continue }
 		
-        for outputUrl in outputFolderList {
-		    try translations.writeFile(name: name, to: outputUrl)
+        for folder in outputFolderList {
+            let languageProjectFolder = folder.appendingPathExtension("lproj")
+		    try translations.writeFile(name: name, to: languageProjectFolder)
         }
 	}
 }
@@ -161,7 +162,7 @@ func export(with settings: Settings, format: POEditor.ExportFileType = .json, fo
 		
 		print("\nExporting " + Locale(identifier: "en").localizedString(forIdentifier: xcode)! + " [" + xcode + "]...")
 		
-		var outputFolderList: [URL] = [exportURL.appendingPathComponent(xcode + ".lproj", isDirectory: true)]
+		var outputFolderList: [URL] = [exportURL.appendingPathComponent(xcode, isDirectory: true)]
         
         if let mapping = settings.mapping {
             if let map = mapping[xcode] {
@@ -171,7 +172,7 @@ func export(with settings: Settings, format: POEditor.ExportFileType = .json, fo
                 print("Language is mapped, creating: " + languages)
                 
                 for language in map {
-                    let languageURL = exportURL.appendingPathComponent(language + ".lproj", isDirectory: true)
+                    let languageURL = exportURL.appendingPathComponent(language, isDirectory: true)
                     outputFolderList.append(languageURL)
                 }
             }
