@@ -89,8 +89,9 @@ extension Collection where Iterator.Element == Translation
 
 			// escape double quotes to be safe
 			let cleanTranslation = translatedTerm.replacingOccurrences(of: "\n", with: "\\n").replacingOccurrences(of: "\"", with: "\\\"")
+			let cleanTerm = transUnit.term.replacingOccurrences(of: "\n", with: "\\n").replacingOccurrences(of: "\"", with: "\\\"")
 			
-			tmpStr += "\"\(transUnit.term)\" = \"\(cleanTranslation)\";\n"
+			tmpStr += "\"\(cleanTerm)\" = \"\(cleanTranslation)\";\n"
 		}
 		
 		let outputName = justName + ".strings"
