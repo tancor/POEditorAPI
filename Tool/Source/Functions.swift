@@ -114,11 +114,11 @@ func processJSON(data: Data, outputFolderList: [URL]) throws
 		else if let plurals = translation["definition"] as? [String: String]
 		{
 			translated = TranslatedTerm.hasPlurals(plurals)
-		}
-		else
-		{
-			translated = TranslatedTerm.notTranslated
-		}
+		} else if translation["definition"] is NSNull { // Support empty strings in localization files (we receive them as nulls).
+	                translated = TranslatedTerm.hasDefinition("")
+                } else {
+        	        translated = TranslatedTerm.notTranslated
+	        }
 		
 		let comment = translation["comment"] as? String
 		let trans = Translation(comment: comment, term: term, translated: translated)
