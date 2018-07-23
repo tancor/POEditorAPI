@@ -8,6 +8,8 @@
 
 import Foundation
 
+let DefaultLocalizableContextFileName = "Localizable.strings"
+
 /// POEditor uses older codes for Chinese
 func xCodeLocaleFromPOEditorCode(code: String) -> String
 {
@@ -34,7 +36,7 @@ func stringsFileName(for context: String) -> String?
 	
 	guard ["strings", "storyboard", "plist"].contains(fileExt) else
 	{
-		return nil
+		return DefaultLocalizableContextFileName
 	}
 	
 	if fileExt == "plist"
@@ -97,11 +99,14 @@ func processJSON(data: Data, outputFolderList: [URL]) throws
 		}
   
         if context.isEmpty {
-            context = "Localizable.strings"
+            context = DefaultLocalizableContextFileName
         } else {
             let range = context.range(of: "/", options: String.CompareOptions.backwards, range: nil, locale: nil)
             if let range = range {
                 context = context.substring(from: range.upperBound)
+            }
+            else {
+                context = DefaultLocalizableContextFileName
             }
         }
 		
